@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # GPU Setup
 # ─────────────────────────────────────────
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"✅ Using device: {device}")
+print(f" Using device: {device}")
 if device.type == "cuda":
     print(f"   GPU: {torch.cuda.get_device_name(0)}")
 
@@ -141,7 +141,7 @@ for epoch in range(1, EPOCHS + 1):
             print(f"\n⏹ Early stopping at epoch {epoch}")
             break
 
-print(f"\n✅ Done! Best val accuracy: {best_val_acc:.4f}")
+print(f"\n Done! Best val accuracy: {best_val_acc:.4f}")
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 axes[0].plot(history["train_acc"], label="Train")
