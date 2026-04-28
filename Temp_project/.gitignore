@@ -1,0 +1,18 @@
+# Dataset Folders (The 40,000+ files)
+train/
+test/
+data/
+
+# Python internal files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+venv/
+gender-env/
+.env
+
+# OS specific files
+.DS_Store
+Thumbs.db
