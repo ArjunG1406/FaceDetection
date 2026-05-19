@@ -116,13 +116,21 @@ class DetectionApp:
                     gender = GENDER_LABELS[gen_pred]
                 
                 fx = w_disp - x - w
+                
+                # Logic for colors based on emotion
                 emo_color_hex = EMOTION_HEX.get(emotion, "#ffffff").lstrip('#')
                 current_emo_color = tuple(int(emo_color_hex[i:i+2], 16) for i in (4, 2, 0))
-                gender_text_color = GENDER_TEXT_COLORS.get(gender, (255, 150, 0))
 
+                # Box and primary text color now follow the detected emotion
                 cv2.rectangle(display, (fx, y), (fx+w, y+h), current_emo_color, 2)
-                cv2.putText(display, gender.upper(), (fx, y-25), cv2.FONT_HERSHEY_DUPLEX, 0.8, gender_text_color, 2)
-                cv2.putText(display, f"Mood: {emotion}", (fx, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, current_emo_color, 1)
+                
+                # Emotion is now the larger, main header
+                cv2.putText(display, emotion.upper(), (fx, y-25), 
+                            cv2.FONT_HERSHEY_DUPLEX, 0.9, current_emo_color, 2)
+                
+                # Gender is moved to secondary label position
+                cv2.putText(display, f"Gender: {gender}", (fx, y-5), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
                 current_faces.append({"emotion": emotion, "gender": gender})
 
@@ -212,7 +220,7 @@ class MainWindow(QMainWindow):
         return f, v
 
     def _reset_ui_state(self):
-        # Clears the image and resets the starting text
+        # Fully resets to starting black screen
         self.video_label.clear() 
         self.video_label.setText("📷 System Ready\nClick Start Detection")
         self.det_lbl.setText("Awaiting Feed...")
@@ -228,10 +236,9 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'app'): 
             self.app.stop()
         self.start_btn.setEnabled(True)
-        self._reset_ui_state()
+        self._reset_ui_state() # Returns to start screen
 
     def update_frame(self, data):
-        # Safety check to prevent frames leaking in after STOP is clicked
         if self.start_btn.isEnabled():
             return
 
@@ -251,8 +258,11 @@ class MainWindow(QMainWindow):
         for i, face in enumerate(faces):
             emo, gen = face["emotion"], face["gender"]
             self.emotion_stats[emo] += 1 
-            gen_hex, emo_hex = ("#0096ff" if gen == "Man" else "#ff69b4"), EMOTION_HEX.get(emo, "#ffffff")
-            text += f"<span style='color:{gen_hex}'><b>P#{i+1}: {gen}</b></span> | <span style='color:{emo_hex}'>{emo}</span><br>"
+            
+            # Sidebar updated: Emotion is now bold and listed first
+            gen_hex = "#0096ff" if gen == "Man" else "#ff69b4"
+            emo_hex = EMOTION_HEX.get(emo, "#ffffff")
+            text += f"<span style='color:{emo_hex}'><b>P#{i+1}: {emo.upper()}</b></span> | <span style='color:{gen_hex}'>{gen}</span><br>"
         
         text += "<br><hr style='background-color:rgba(255,255,255,0.1); border:none; height:1px;'><br>"
         text += "<b style='font-size:14px; color:#ffffff;'>MOOD TRENDS</b><br>"
